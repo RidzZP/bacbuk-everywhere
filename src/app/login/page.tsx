@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { BookOpen, Loader2 } from "lucide-react";
@@ -15,12 +15,22 @@ export default function LoginPage() {
     }
   }, [user, loading, router]);
 
+  const [loginError, setLoginError] = useState<string | null>(null);
+
   const handleLogin = async () => {
+    setLoginError(null);
     try {
       await loginWithGoogle();
       router.push("/");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login failed:", error);
+      if (error?.code === "auth/unauthorized-domain") {
+        setLoginError("Domain ini belum diotorisasi di Firebase Console. Harap tambahkan domain Vercel ini ke menu Authorized Domains.");
+      } else if (error?.code === "auth/popup-blocked") {
+        setLoginError("Popup diblokir oleh browser. Harap izinkan popup untuk situs ini.");
+      } else {
+        setLoginError(error?.message || "Gagal masuk menggunakan Google.");
+      }
     }
   };
 
@@ -54,6 +64,12 @@ export default function LoginPage() {
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-4 leading-relaxed max-w-xs">
             Sync your reading progress across all your devices. Kindle-like experience on the web.
           </p>
+
+          {loginError && (
+            <div className="mt-4 p-3 text-xs bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 rounded-xl text-red-650 dark:text-red-400 font-medium max-w-xs text-left">
+              {loginError}
+            </div>
+          )}
 
           <button
             onClick={handleLogin}

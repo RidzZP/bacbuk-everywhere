@@ -40,6 +40,13 @@ export default function ReaderPage({ params }: { params: Promise<{ bookId: strin
   const [totalPages, setTotalPages] = useState(0);
   const [readingMode, setReadingMode] = useState<"page" | "scroll">("page");
 
+  // Adjust default scale on mobile to fit page width
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 640) {
+      setScale(0.55);
+    }
+  }, []);
+
   // Sync initial page once progress is loaded
   useEffect(() => {
     if (progress && progress.currentPage) {
@@ -135,7 +142,7 @@ export default function ReaderPage({ params }: { params: Promise<{ bookId: strin
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+    <div className="h-screen w-screen overflow-hidden flex flex-col bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
       <ReaderToolbar
         title={book.title}
         currentPage={activePage}

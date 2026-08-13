@@ -211,9 +211,9 @@ export default function PdfReader({
   }, [pageNumber, numPages, readingMode]);
 
   return (
-    <div className="flex flex-col items-center justify-between flex-grow w-full bg-slate-50 dark:bg-slate-950 min-h-[calc(100vh-3.5rem)] py-6 relative">
+    <div className="flex flex-col items-center justify-between flex-grow w-full bg-slate-50 dark:bg-slate-950 min-h-[calc(100vh-3.5rem)] py-0 sm:py-6 relative">
       {/* PDF Viewport Area */}
-      <div className="flex-grow flex items-center justify-center w-full px-4 overflow-auto max-w-4xl">
+      <div className="flex-grow flex items-center justify-start sm:justify-center w-full px-0 sm:px-4 overflow-auto no-scrollbar max-w-4xl">
         {error ? (
           <div className="flex flex-col items-center gap-3 p-6 text-center max-w-sm rounded-2xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50">
             <AlertCircle className="text-red-600 dark:text-red-400" size={32} />
@@ -230,7 +230,7 @@ export default function PdfReader({
               transform: `translateX(${offsetX}px)`,
               transition: isDragging ? "none" : "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
             }}
-            className={`bg-white dark:bg-slate-900 shadow-md rounded-lg border border-slate-200 dark:border-slate-800 p-2 sm:p-4 transition-colors duration-300 select-none ${slideAnimation}`}
+            className={`bg-white dark:bg-slate-900 shadow-none sm:shadow-md rounded-none sm:rounded-lg border-0 sm:border border-slate-200 dark:border-slate-800 p-0 sm:p-4 transition-colors duration-300 select-none w-full sm:w-auto ${slideAnimation}`}
           >
             <Document
               file={file}
@@ -259,7 +259,7 @@ export default function PdfReader({
           </div>
         ) : (
           /* Continuous Scroll Mode: Vertical stacking list of pages */
-          <div className="flex flex-col items-center w-full max-w-2xl px-2 py-2">
+          <div className="flex flex-col items-center w-full max-w-2xl px-0 sm:px-2 py-0 sm:py-2 overflow-y-auto no-scrollbar">
             <Document
               file={file}
               onLoadSuccess={onDocumentLoadSuccess}
@@ -279,7 +279,7 @@ export default function PdfReader({
                   <div
                     key={pg}
                     id={`page-${pg}`}
-                    className="my-5 shadow bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden w-full transition-colors duration-300"
+                    className="my-1 sm:my-5 shadow-none sm:shadow bg-white dark:bg-slate-900 border-0 sm:border border-slate-200 dark:border-slate-800 rounded-none sm:rounded-lg overflow-hidden w-full transition-colors duration-300"
                     style={{ minHeight: `${550 * scale}px` }}
                   >
                     {isPageVisible ? (
