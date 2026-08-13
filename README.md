@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Readable Books
 
-## Getting Started
+Readable Books is a personal cloud-based PDF reader built as a Progressive Web App (PWA). It provides a Kindle-like reading experience, allowing users to read local PDF books and seamlessly synchronize their reading progress across all devices.
 
-First, run the development server:
+## 🚀 Features
 
+- **Google Sign-In**: Secure and fast authentication using Firebase Auth.
+- **Reading Progress Sync**: Automatically saves and restores the last opened page for each book in Cloud Firestore.
+- **Auto-Save**: Saves reading progress on page change (debounced), tab close, visibility changes, or unloading.
+- **Premium Kindle Aesthetics**: Cozy cream/slate minimal layouts, customizable stylized book covers, and distraction-free interface.
+- **PWA Ready**: Installable on Android, iOS, Windows, and macOS.
+- **Offline Support**: Service worker caching allows reading opened PDFs and UI navigation offline.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 15 (App Router, TypeScript, React 19)
+- **Styling**: Tailwind CSS
+- **PDF Engine**: `react-pdf` / `pdfjs-dist`
+- **Database & Auth**: Firebase (Authentication & Firestore)
+- **Deployment**: Vercel
+
+---
+
+## 💻 Quick Start
+
+### 1. Install Dependencies
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Configure Environment Variables
+Create or verify `.env.local` is present with the Firebase keys:
+```env
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Run Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) on your browser.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 4. Build for Production
+```bash
+npm run build
+npm run start
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📘 Documentation
+For a complete setup guide including Firebase console configuration and Firestore security rules, see [guide.md](file:///c:/Users/USER/Documents/ZUL/SERVICES/readable-books/guide.md).
