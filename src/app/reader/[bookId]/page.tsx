@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, use, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useAuth } from "@/hooks/useAuth";
 import { useReadingProgress } from "@/hooks/useReadingProgress";
 import { getBookById } from "@/lib/books";
 import ReaderToolbar from "@/components/ReaderToolbar";
+import { useHighlights } from "@/hooks/useHighlights";
 import { Loader2, AlertCircle } from "lucide-react";
 import Link from "next/link";
 
@@ -33,24 +34,62 @@ export default function ReaderPage({ params }: { params: Promise<{ bookId: strin
     user?.uid,
     bookId
   );
+  const { highlights, addHighlight, deleteHighlight } = useHighlights(user?.uid, bookId);
 
   const [scale, setScale] = useState(1.0);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [activePage, setActivePage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const [readingMode, setReadingMode] = useState<"page" | "scroll">("page");
 
-  // Adjust default scale on mobile to fit page width
+  // Adjust default scale on load (75% for desktop to prevent vertical overflow, 100% for mobile)
   useEffect(() => {
-    if (typeof window !== "undefined" && window.innerWidth < 640) {
-      setScale(0.55);
+    if (typeof window !== "undefined") {
+      if (window.innerWidth >= 640) {
+        setScale(0.75);
+      } else {
+        setScale(1.0);
+      }
     }
   }, []);
+  const [activePage, setActivePage] = useState<number | null>(null);
+  const [totalPages, setTotalPages] = useState(0);
+  const totalPagesRef = useRef(0);
+  const [readingMode, setReadingMode] = useState<"page" | "scroll">("page");
+  const [showOverlay, setShowOverlay] = useState(true);
+
+  // Hide controls in fullscreen by default
+  useEffect(() => {
+    if (isFullscreen) {
+      setShowOverlay(false);
+    } else {
+      setShowOverlay(true);
+    }
+  }, [isFullscreen]);
+
+  const handleToggleOverlay = (e: React.MouseEvent) => {
+    if (isFullscreen) {
+      const target = e.target as HTMLElement;
+      // Prevent toggling when clicking active buttons, links, or inputs
+      if (target.closest("button") || target.closest("input") || target.closest("a")) {
+        return;
+      }
+      setShowOverlay((prev) => !prev);
+    }
+  };
+
+  // Keep totalPagesRef updated
+  useEffect(() => {
+    totalPagesRef.current = totalPages;
+  }, [totalPages]);
+
+
 
   // Sync initial page once progress is loaded
   useEffect(() => {
-    if (progress && progress.currentPage) {
-      setActivePage(progress.currentPage);
+    if (!progressLoading) {
+      if (progress && progress.currentPage) {
+        setActivePage(progress.currentPage);
+      } else {
+        setActivePage(1);
+      }
     }
   }, [progressLoading, progress]);
 
@@ -85,18 +124,21 @@ export default function ReaderPage({ params }: { params: Promise<{ bookId: strin
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
-  const handlePageChange = (page: number, total?: number) => {
+  const handlePageChange = useCallback((page: number, total?: number) => {
     setActivePage(page);
+    let resolvedTotal = total;
     if (total) {
       setTotalPages(total);
+    } else {
+      resolvedTotal = totalPagesRef.current;
     }
     // Trigger debounced save progress
-    saveProgress(page, total || totalPages, book?.title || "Untitled Book");
-  };
+    saveProgress(page, resolvedTotal || 0, book?.title || "Untitled Book");
+  }, [saveProgress, book?.title]);
 
-  const handleSaveImmediately = (page: number, total: number) => {
+  const handleSaveImmediately = useCallback((page: number, total: number) => {
     saveProgressImmediately(page, total, book?.title || "Untitled Book");
-  };
+  }, [saveProgressImmediately, book?.title]);
 
   if (authLoading || !user) {
     return (
@@ -130,7 +172,7 @@ export default function ReaderPage({ params }: { params: Promise<{ bookId: strin
   }
 
   // Wait for reading progress to load to avoid resetting page to 1
-  if (progressLoading) {
+  if (progressLoading || activePage === null) {
     return (
       <div className="flex h-screen w-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="flex flex-col items-center gap-2">
@@ -142,20 +184,38 @@ export default function ReaderPage({ params }: { params: Promise<{ bookId: strin
   }
 
   return (
-    <div className="h-screen w-screen overflow-hidden flex flex-col bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
-      <ReaderToolbar
-        title={book.title}
-        currentPage={activePage}
-        totalPages={totalPages}
-        onPageChange={(page) => handlePageChange(page, totalPages)}
-        scale={scale}
-        onScaleChange={setScale}
-        isFullscreen={isFullscreen}
-        onToggleFullscreen={toggleFullscreen}
-        readingMode={readingMode}
-        onReadingModeChange={setReadingMode}
-      />
-      <main className="flex-grow flex flex-col">
+    <div 
+      onClick={handleToggleOverlay}
+      className="h-screen w-screen overflow-hidden flex flex-col bg-slate-50 dark:bg-slate-950 transition-colors duration-300 relative"
+    >
+      {/* Header Overlay */}
+      <div 
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out ${
+          !showOverlay && isFullscreen 
+            ? "-translate-y-full opacity-0 pointer-events-none" 
+            : "translate-y-0 opacity-100"
+        }`}
+      >
+        <ReaderToolbar
+          title={book.title}
+          currentPage={activePage}
+          totalPages={totalPages}
+          onPageChange={(page) => handlePageChange(page, totalPages)}
+          scale={scale}
+          onScaleChange={setScale}
+          isFullscreen={isFullscreen}
+          onToggleFullscreen={toggleFullscreen}
+          readingMode={readingMode}
+          onReadingModeChange={setReadingMode}
+        />
+      </div>
+
+      {/* Main content area */}
+      <main 
+        className={`flex-grow flex flex-col overflow-hidden transition-all duration-300 ease-in-out ${
+          !showOverlay && isFullscreen ? "pt-0" : "pt-14"
+        }`}
+      >
         <PdfReader
           file={book.file}
           initialPage={activePage}
@@ -163,6 +223,11 @@ export default function ReaderPage({ params }: { params: Promise<{ bookId: strin
           onPageChange={handlePageChange}
           onSaveImmediately={handleSaveImmediately}
           readingMode={readingMode}
+          showOverlay={showOverlay}
+          isFullscreen={isFullscreen}
+          highlights={highlights}
+          onAddHighlight={addHighlight}
+          onDeleteHighlight={deleteHighlight}
         />
       </main>
     </div>

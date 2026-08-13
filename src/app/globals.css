@@ -44,6 +44,9 @@ body {
 
 /* Hide scrollbar utility */
 .no-scrollbar::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
   display: none !important;
 }
 .no-scrollbar {
@@ -53,8 +56,31 @@ body {
 
 /* Responsive react-pdf page scaling */
 .react-pdf__Page {
-  display: flex !important;
-  justify-content: center !important;
+  position: relative !important;
+  display: inline-block !important;
+}
+
+/* Fix PDF text layer selection and styling */
+.textLayer {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  z-index: 20 !important;
+  pointer-events: auto !important;
+  cursor: text !important;
+}
+
+.textLayer :is(span, br) {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  pointer-events: auto !important;
+  cursor: text !important;
+}
+
+/* Prevent canvas from intercepting selection drags or triggering image drag */
+.react-pdf__Page__canvas {
+  pointer-events: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
 }
 
 
