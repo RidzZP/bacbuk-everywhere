@@ -1,4 +1,4 @@
-const CACHE_NAME = "readable-books-v1";
+const CACHE_NAME = "readable-books-v2";
 const ASSETS = [
   "/",
   "/login",
