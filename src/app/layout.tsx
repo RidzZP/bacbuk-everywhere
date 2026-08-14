@@ -23,13 +23,13 @@ export const viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Readable Books",
+  title: "Bacbuk Everywhere",
   description: "Personal Cloud PDF Reader",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Readable Books",
+    title: "Bacbuk Everywhere",
   },
 };
 

@@ -123,7 +123,7 @@ export default function LibraryPage() {
             <BookOpen size={20} />
           </div>
           <div>
-            <h1 className="font-serif font-bold text-base leading-none">Readable Books</h1>
+            <h1 className="font-serif font-bold text-base leading-none">Bacbuk Everywhere</h1>
             <span className="text-[9px] font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500">Library</span>
           </div>
         </div>

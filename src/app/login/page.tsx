@@ -55,7 +55,7 @@ export default function LoginPage() {
           </div>
 
           <h1 className="font-serif font-bold text-2xl sm:text-3xl text-slate-800 dark:text-slate-100 tracking-tight">
-            Readable Books
+            Bacbuk Everywhere
           </h1>
           <p className="text-xs uppercase tracking-widest font-semibold text-slate-400 dark:text-slate-500 mt-1">
             Personal Cloud Reader
